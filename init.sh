@@ -80,3 +80,30 @@ gcloud ai-platform jobs submit training $JOB_NAME \
        --verbosity DEBUG
 
 gcloud ai-platform jobs stream-logs $JOB_NAME
+
+gsutil ls -r $OUTPUT_PATH
+
+# tensorboard --logidr=$OUTPUT_PATH --port=8080
+
+MODEL_NAME=census
+
+gcloud ai-platform models create $MODEL_NAME --regions=$REGION
+
+gsutil ls -r $OUTPUT_PATH/export
+
+MODEL_BINARIES=$OUTPUT_PATH/export/census/$TIME_STAMP/
+
+gcloud ai-platform versions create v1 \
+       --model $MODEL_NAME \
+       --origin $MODEL_BINARIES \
+       --runtime-version 1.10
+
+gcloud ai-platform models list
+
+gcloud ai-platform predict \
+       --model $MODEL_NAME \
+       --version v1 \
+       --json-instances ../test.json
+
+
+
