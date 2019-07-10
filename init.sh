@@ -40,4 +40,17 @@ gcloud ai-platform local train \
 # tensorboard --logdir=$MODEL_DIR --port=8080
 
 export TIME_STAMP=$(ls output/export/census)
-echo $TIME_STAMP
+#echo $TIME_STAMP
+
+gcloud ai-platform local predict \
+       --model-dir output/export/census/$TIME_STAMP \
+       --json-instances ../test.json
+
+PROJECT_ID=$(gcloud config list project --format "value(core.project)")
+BUCKET_NAME=${PROEJCT_ID}-mlengine
+echo $BUCKET_NAME
+REGION=us-central1
+
+gsutil mb -l $REGION gs://$BUCKET_NAME
+
+
