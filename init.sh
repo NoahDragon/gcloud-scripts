@@ -47,7 +47,7 @@ gcloud ai-platform local predict \
        --json-instances ../test.json
 
 PROJECT_ID=$(gcloud config list project --format "value(core.project)")
-BUCKET_NAME=${PROJE5CT_ID}-mlengine
+BUCKET_NAME=${PROJECT_ID}-mlengine
 echo $BUCKET_NAME
 REGION=us-central1
 
