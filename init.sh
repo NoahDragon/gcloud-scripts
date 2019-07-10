@@ -47,10 +47,36 @@ gcloud ai-platform local predict \
        --json-instances ../test.json
 
 PROJECT_ID=$(gcloud config list project --format "value(core.project)")
-BUCKET_NAME=${PROEJCT_ID}-mlengine
+BUCKET_NAME=${PROJE5CT_ID}-mlengine
 echo $BUCKET_NAME
 REGION=us-central1
 
 gsutil mb -l $REGION gs://$BUCKET_NAME
 
+gsutil cp -r data gs://$BUCKET_NAME/data
 
+TRAIN_DATA=gs://$BUCKET_NAME/data/adult.data.csv
+EVAL_DATA=gs://$BUCKET_NAME/data/adult.test.csv
+
+gsutil cp ../test.json gs://$BUCKET_NAME/data/test.json
+
+TEST_JSON=gs://$BUCKET_NAME/data/test.json
+
+JOB_NAME=census_single_1
+
+OUTPUT_PATH=gs://$BUCKET_NAME/$JOB_NAME
+
+gcloud ai-platform jobs submit training $JOB_NAME \
+       --job-dir $OUTPUT_PATH \
+       --runtime-version 1.10 \
+       --module-name trainer.task \
+       --package-path trainer/ \
+       --region $REGION \
+       -- \
+       --train-files $TRAIN_DATA \
+       --eval-files $EVAL_DATA \
+       --train-steps 1000 \
+       --eval-steps 100 \
+       --verbosity DEBUG
+
+gcloud ai-platform jobs stream-logs $JOB_NAME
